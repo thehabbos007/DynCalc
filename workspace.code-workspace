@@ -1,0 +1,37 @@
+{
+  "folders": [
+    {
+      "name": "DynCalc (Root)",
+      "path": "."
+    },
+    {
+      "name": "Core",
+      "path": "./DynCalc.Core"
+    },
+    {
+      "name": "Lang",
+      "path": "./DynCalc.Lang"
+    },
+    {
+      "name": "Backend",
+      "path": "./DynCalc.Web"
+    },
+    {
+      "name": "Tests",
+      "path": "./DynCalc.Tests"
+    },
+    {
+      "name": "WebSocket Test Server",
+      "path": "./ws_counter"
+    },
+  ],
+  "settings": {
+    "files.exclude": {
+      "DynCalc.Core": true,
+      "DynCalc.Lang": true,
+      "DynCalc.Web": true,
+      "DynCalc.Tests": true,
+      "ws_counter": true,
+    }
+  }
+}

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarnOn>3390;$(WarnOn)</WarnOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ActorTypes.fs" />
+    <Compile Include="Library.fs" />
+    <Compile Include="Providers/ProviderTypes.fs" />
+    <Compile Include="Providers/WebSocketProvider.fs" />
+    <Compile Include="Providers/StockPriceProvider.fs" />
+    <Compile Include="Providers/HttpProvider.fs" />
+    <Compile Include="Sinks/SinkTypes.fs" />
+    <Compile Include="Sinks/HttpSink.fs" />
+    <Compile Include="Sinks/LogSink.fs" />
+    <Compile Include="Runtime/Graph.fs" />
+    <Compile Include="Runtime/Evaluator.fs" />
+    <Compile Include="SinkActor.fs" />
+    <Compile Include="ProgramActor.fs" />
+    <Compile Include="ProviderActor.fs" />
+    <Compile Include="GlobalActor.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Control.Websockets" Version="0.2.2" />
+    <PackageReference Include="FSharp.Data" Version="4.2.6" />
+    <PackageReference Include="FSharp.Data.Adaptive" Version="1.2.6" />
+    <PackageReference Include="FParsec" Version="1.1.1" />
+    <ProjectReference Include="..\DynCalc.Lang\DynCalc.Lang.fsproj" />
+  </ItemGroup>
+
+</Project>

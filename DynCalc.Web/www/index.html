@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/codemirror.min.css" />
+    <title>Eventful Spreadsheets-ish</title>
+  </head>
+  <body>
+    <script src="js/codemirror.min.js"></script>
+    <div class="btn-container">
+      <button id="ast-btn" class="btn">AST</button>
+      <button id="deploy-btn" class="btn">Deploy</button>
+      <button id="registry-btn" class="btn">Registry</button>
+    </div>
+    <div id="container">
+      <textarea id="editor">
+type StockPrice :: Number[] deriving (json "$.data[*].p");
+btc_price <- ws("wss://ws.finnhub.io?token=",
+                "{\"type\":\"subscribe\",\"symbol\":\"BINANCE:BTCUSDT\"}") 
+                as StockPrice;
+
+type ConversionRate :: Number deriving (json "$.usd.inverseRate");
+usd_to_dkk <- http("http://www.floatrates.com/daily/dkk.json", "5000") as ConversionRate;
+
+func avg = / . [%+, length];
+func avg_in_dkk = * . [id . 0, avg . 1];
+
+btc_avg_price_in_dkk = avg_in_dkk:<usd_to_dkk, btc_price>;
+btc_avg_price_in_dkk -> http();
+btc_avg_price_in_dkk -> log();</textarea
+      >
+      <div id="right">
+        <pre id="result">
+Output will appear here.
+          </pre
+        >
+        <hr />
+        <pre id="live-data"></pre>
+        <hr />
+        <pre id="registry-table"></pre>
+      </div>
+    </div>
+    <script>
+      const astBtn = document.getElementById("ast-btn");
+      const deployBtn = document.getElementById("deploy-btn");
+      const registryTableBtn = document.getElementById("registry-btn");
+      const result = document.getElementById("result");
+      const liveDataEl = document.getElementById("live-data");
+      const registryTable = document.getElementById("registry-table");
+      let liveData = {
+        enabled: false,
+        id: "",
+        doRender: (data) => {
+          liveDataEl.innerText = data;
+        },
+        doLoad: async function () {
+          if (!this.enabled || this.id === "") return;
+          const rawResponse = await fetch(`/api/data/${this.id}`);
+          const response = await rawResponse.json();
+          if (!rawResponse.ok || response.result === "Error") {
+            this.enabled = false;
+            this.id = "";
+            this.doRender("");
+            return;
+          }
+
+          this.doRender(response.data);
+        },
+      };
+
+      const editor = CodeMirror.fromTextArea(
+        document.getElementById("editor"),
+        {
+          mode: "javascript",
+          lineNumbers: true,
+        }
+      );
+      editor.save();
+
+      const loadRegistry = async (_) => {
+        const rawResponse = await fetch("/api/registry");
+        const content = await rawResponse.json();
+        console.log("Deploy result:", content);
+        let table = content
+          .map(
+            (item) =>
+              `<pre data-id="${item.id}">Program: <a href="#" onclick="watch(this)">${item.id}</a>. Providers: ${item.providers}, Sinks: ${item.sinks}, <a href="#" onclick="undeploy(this);">Stop program</a><pre>`
+          )
+          .join("<br/>");
+        registryTable.innerHTML = table;
+      };
+
+      astBtn.onclick = async (_) => {
+        let payload = editor.getValue();
+
+        const rawResponse = await fetch("/api/programAst", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ label: "_", payload }),
+        });
+        const content = await rawResponse.json();
+        result.innerText = content.data;
+        console.log("Ast result:", content);
+      };
+
+      deployBtn.onclick = async (_) => {
+        let payload = editor.getValue();
+
+        const rawResponse = await fetch("/api/program", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ label: "_", payload }),
+        });
+        const content = await rawResponse.json();
+        console.log("Deploy result:", content);
+        if (content.result === "Success") {
+          result.innerHTML = `Deployment id: ${content.data}<br/>If data sink is used, go to <a target="_blank" href="/api/data/${content.data}">/api/data/${content.data}</a>`;
+          liveData.id = content.data;
+          liveData.enabled = true;
+        } else {
+          result.innerText = content.data;
+        }
+        await loadRegistry();
+      };
+
+      const undeploy = async (el) => {
+        let id = el.parentElement.getAttribute("data-id");
+        const rawResponse = await fetch(`/api/undeploy/${id}`, {
+          method: "DELETE",
+        });
+
+        el.parentElement.remove();
+      };
+
+      const watch = async (el) => {
+        let id = el.parentElement.getAttribute("data-id");
+        liveData.id = id;
+        liveData.enabled = true;
+      };
+
+      registryTableBtn.onclick = loadRegistry;
+      window.onload = loadRegistry;
+
+      setInterval(() => {
+        liveData.doLoad();
+      }, 700);
+    </script>
+  </body>
+</html>

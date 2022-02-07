@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarnOn>3390;$(WarnOn)</WarnOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FParsec" Version="1.1.1" />
+    <PackageReference Include="FSharp.Data" Version="4.2.6" />
+    <PackageReference Include="FSharpx.Collections" Version="3.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="DeriveParsers/JsonPath.fs" />
+    <Compile Include="DeriveParsers/Derive.fs" />
+    <Compile Include="FpSys.fs" />
+    <Compile Include="Ast.fs" />
+    <Compile Include="Parser.fs" />
+    <Compile Include="MultilineParser.fs" />
+  </ItemGroup>
+
+</Project>
