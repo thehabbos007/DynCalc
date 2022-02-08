@@ -27,7 +27,7 @@ The `http` provider polls the URL given as the first parameter and an interval t
 Example data that could be supplied to `avg_in_dkk`: `<6.6, <44045.20, 44000, 44050.02>>`
 Which is equivalent to the following mathematical expression: `6.6 * ((44045.20 + 44000 + 44050.02) / 3)`
 
-The `http` sinks exposes data on the left side to plain text on a HTTP endpoint with the unique ID of the program instance. `/api/data/<id>`
+The `http` sinks exposes data on the left side to plain text on an HTTP endpoint with the unique ID of the program instance. `/api/data/<id>`
 
 ## Running the system
 In order to run the DynCalc runtime system, the following requirements must be met on the host machine. 
