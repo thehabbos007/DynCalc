@@ -1,7 +1,7 @@
 # DynCalc
 B.Eng. project 2021.
 
-**Example DynCalc program*(:
+**Example DynCalc program**:
 ```
 type StockPrice :: Number[] deriving (json "$.data[*].p");
 btc_price <- ticker("BINANCE:BTCUSDT") as StockPrice;
